@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html dir="ltr" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <title>ShadMini Code - محرر الأكواد</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="toolbar">
+    <button id="newBtn">📄 جديد</button>
+    <button id="openBtn">📂 فتح ملف</button>
+    <button id="saveBtn">💾 حفظ</button>
+    <select id="langSelect">
+      <option value="javascript">JavaScript</option>
+      <option value="python">Python</option>
+      <option value="html">HTML</option>
+      <option value="css">CSS</option>
+    </select>
+    <input type="range" id="fontSlider" min="12" max="32" value="18" step="1">
+    <span id="fontValue">18px</span>
+  </div>
+
+  <div class="editor-wrapper">
+    <textarea id="codeEditor" placeholder="اكتب كودك هنا ..."></textarea>
+  </div>
+
+  <div class="status-bar">
+    <span id="statusMsg">جاهز | ShadMini Code</span>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
