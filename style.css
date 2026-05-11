@@ -12,7 +12,6 @@ body {
   flex-direction: column;
 }
 
-/* شريط الأدوات مناسب للمس */
 .toolbar {
   background: #181825;
   padding: 12px;
@@ -57,27 +56,25 @@ input[type="range"] {
   font-size: 14px;
 }
 
-/* حاوية المحرر */
 .editor-wrapper {
   flex: 1;
   overflow: auto;
+  position: relative;
 }
 
-textarea {
-  width: 100%;
-  height: 100%;
-  background: #1e1e2f;
-  color: #cdd6f4;
+/* تنسيق CodeMirror ليملأ الحاوية ويبدو مثل VS Code */
+.CodeMirror {
+  height: 100% !important;
   font-family: 'Fira Code', 'Cascadia Code', monospace;
   font-size: 18px;
-  padding: 20px;
-  border: none;
-  outline: none;
-  resize: none;
-  line-height: 1.6;
+  background: #1e1e2f;
 }
 
-/* شريط الحالة */
+/* تحسين التمرير باللمس */
+.CodeMirror-scroll {
+  -webkit-overflow-scrolling: touch;
+}
+
 .status-bar {
   background: #11111b;
   color: #a6adc8;
@@ -87,7 +84,6 @@ textarea {
   text-align: center;
 }
 
-/* تحسين للهواتف الصغيرة */
 @media (max-width: 600px) {
   .toolbar {
     justify-content: center;
@@ -96,8 +92,7 @@ textarea {
     padding: 8px 12px;
     font-size: 14px;
   }
-  textarea {
+  .CodeMirror {
     font-size: 18px;
-    padding: 12px;
   }
-  }
+}
