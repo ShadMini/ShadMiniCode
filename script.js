@@ -11,7 +11,7 @@ const saveBtn = document.getElementById('saveBtn');
 const textarea = document.getElementById('codeEditor');
 let editor = CodeMirror.fromTextArea(textarea, {
   lineNumbers: true,          // أرقام الأسطر
-  theme: "material-darker",   // ثيم غامق يشبه VS Code
+  theme: "dracula",   // ثيم غامق يشبه VS Code
   mode: "javascript",         // اللغة الافتراضية
   autoCloseBrackets: true,    // إغلاق الأقواس تلقائياً
   matchBrackets: true,        // تمييز الأقواس المتطابقة
@@ -222,6 +222,77 @@ openBtn.addEventListener('click', () => {
   };
   input.click();
 });
+
+// Sidebar tab switching
+document.querySelectorAll('.sidebar-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    document.querySelectorAll('.sidebar-tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+    tab.classList.add('active');
+    const panel = document.getElementById(tab.dataset.panel + '-panel');
+    if (panel) panel.classList.add('active');
+  });
+});
+
+// Explorer functions
+function toggleFolder(element) {
+  element.classList.toggle('expanded');
+}
+
+function openFile(filename) {
+  // افتراضياً، افتح ملفات افتراضية
+  let content = '';
+  if (filename === 'index.html') content = '<!DOCTYPE html>\n<html>\n<head>\n<title></title>\n</head>\n<body>\n</body>\n</html>';
+  else if (filename === 'script.js') content = '// JavaScript code';
+  else if (filename === 'style.css') content = '/* CSS styles */';
+  createNewTab(content, filename, getLanguageFromFile(filename));
+}
+
+// Terminal simulation
+document.getElementById('terminal-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') {
+    const command = e.target.value;
+    const output = document.getElementById('terminal-output');
+    output.innerHTML += '<br>$ ' + command + '<br>';
+    // محاكاة أوامر بسيطة
+    if (command === 'ls') output.innerHTML += 'index.html script.js style.css';
+    else if (command === 'pwd') output.innerHTML += '/workspace';
+    else output.innerHTML += 'command not found: ' + command;
+    output.innerHTML += '<br>$ ';
+    e.target.value = '';
+    output.scrollTop = output.scrollHeight;
+  }
+});
+
+// Search
+document.querySelector('.search-input').addEventListener('input', (e) => {
+  const query = e.target.value;
+  const results = document.getElementById('search-results');
+  results.innerHTML = '';
+  if (query) {
+    // بحث بسيط في المحتوى الحالي
+    const content = editor.getValue();
+    const lines = content.split('\n');
+    lines.forEach((line, i) => {
+      if (line.includes(query)) {
+        results.innerHTML += `<div>${i+1}: ${line}</div>`;
+      }
+    });
+  }
+});
+
+// Git functions (simplified)
+document.getElementById('git-init').addEventListener('click', () => alert('Git initialized'));
+document.getElementById('git-commit').addEventListener('click', () => alert('Committed'));
+document.getElementById('git-push').addEventListener('click', () => alert('Pushed'));
+
+function getLanguageFromFile(filename) {
+  if (filename.endsWith('.js')) return 'javascript';
+  if (filename.endsWith('.py')) return 'python';
+  if (filename.endsWith('.html')) return 'html';
+  if (filename.endsWith('.css')) return 'css';
+  return 'javascript';
+}
 
 // ضبط حجم الخط الابتدائي
 setEditorFontSize(fontSlider.value);

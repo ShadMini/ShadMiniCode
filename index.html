@@ -4,10 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
   <title>ShadMini Code - محرر الهواتف الاحترافي</title>
-  <!-- CodeMirror -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
+  <!-- Monaco Editor -->
+  <script src="https://unpkg.com/monaco-editor@0.45.0/min/vs/loader.min.js"></script>
   <!-- VS Code Codicons (أيقونات حقيقية من مايكروسوفت) -->
   <link href="https://unpkg.com/@vscode/codicons@0.0.35/dist/codicon.css" rel="stylesheet">
   <!-- isomorphic-git و lightning-fs للعمل مع Git حقيقياً -->
@@ -31,6 +29,94 @@
       display: flex;
       flex-direction: column;
       height: 100%;
+    }
+    /* Sidebar */
+    .main-content {
+      display: flex;
+      flex: 1;
+      overflow: hidden;
+    }
+    .sidebar {
+      width: 250px;
+      background: #18181b;
+      border-right: 1px solid #2e2e32;
+      display: flex;
+      flex-direction: column;
+    }
+    .sidebar-header {
+      padding: 8px;
+      background: #141416;
+      border-bottom: 1px solid #2e2e32;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .sidebar-tabs {
+      display: flex;
+      background: #18181b;
+    }
+    .sidebar-tab {
+      padding: 8px 12px;
+      cursor: pointer;
+      background: #18181b;
+      border-bottom: 2px solid transparent;
+    }
+    .sidebar-tab.active {
+      background: #0e0e12;
+      border-bottom-color: #0078d4;
+    }
+    .sidebar-content {
+      flex: 1;
+      overflow: hidden;
+    }
+    .panel {
+      display: none;
+      height: 100%;
+      overflow: auto;
+    }
+    .panel.active {
+      display: block;
+    }
+    .explorer-tree {
+      padding: 8px;
+    }
+    .tree-item {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      padding: 2px 4px;
+      cursor: pointer;
+      border-radius: 4px;
+    }
+    .tree-item:hover {
+      background: #2e2e32;
+    }
+    .tree-item.expanded .tree-children {
+      display: block;
+    }
+    .tree-children {
+      display: none;
+      margin-left: 16px;
+    }
+    .terminal {
+      background: #0e0e12;
+      color: #e9e9e9;
+      font-family: monospace;
+      padding: 8px;
+      height: 200px;
+      overflow: auto;
+      border-top: 1px solid #2e2e32;
+    }
+    .search-panel {
+      padding: 8px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 4px;
+      background: #1e1e22;
+      border: 1px solid #3e3e42;
+      color: #e9e9e9;
+      border-radius: 4px;
     }
     /* شريط القوائم بأسلوب VS Code */
     .menu-bar {
@@ -210,8 +296,49 @@
   
   <div class="main-layout">
     <div class="sidebar">
-      <div class="sidebar-icon" id="gitSidebarBtn"><i class="codicon codicon-github"></i></div>
-      <div class="sidebar-icon" id="explorerPlaceholder"><i class="codicon codicon-files"></i></div>
+      <div class="sidebar-tabs">
+        <div class="sidebar-tab active" data-panel="explorer"><i class="codicon codicon-files"></i></div>
+        <div class="sidebar-tab" data-panel="search"><i class="codicon codicon-search"></i></div>
+        <div class="sidebar-tab" data-panel="git"><i class="codicon codicon-git-branch"></i></div>
+        <div class="sidebar-tab" data-panel="extensions"><i class="codicon codicon-extensions"></i></div>
+        <div class="sidebar-tab" data-panel="terminal"><i class="codicon codicon-terminal"></i></div>
+      </div>
+      <div class="sidebar-content">
+        <div id="explorer-panel" class="panel active">
+          <div class="explorer-tree">
+            <div class="tree-item" onclick="toggleFolder(this)">
+              <i class="codicon codicon-folder"></i> project
+              <div class="tree-children">
+                <div class="tree-item" onclick="openFile('index.html')">
+                  <i class="codicon codicon-file"></i> index.html
+                </div>
+                <div class="tree-item" onclick="openFile('script.js')">
+                  <i class="codicon codicon-file"></i> script.js
+                </div>
+                <div class="tree-item" onclick="openFile('style.css')">
+                  <i class="codicon codicon-file"></i> style.css
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div id="search-panel" class="panel">
+          <input type="text" class="search-input" placeholder="بحث في الملفات">
+          <div id="search-results"></div>
+        </div>
+        <div id="git-panel" class="panel">
+          <button id="git-init">تهيئة Git</button>
+          <button id="git-commit">تأكيد</button>
+          <button id="git-push">رفع</button>
+        </div>
+        <div id="extensions-panel" class="panel">
+          <p>إضافات (قريباً)</p>
+        </div>
+        <div id="terminal-panel" class="panel">
+          <div class="terminal" id="terminal-output">Terminal ready<br>$ </div>
+          <input type="text" id="terminal-input" placeholder="أمر">
+        </div>
+      </div>
     </div>
     <div class="editor-panel">
       <div class="editor-toolbar">
