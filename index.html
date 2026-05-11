@@ -14,30 +14,58 @@
   
   <link rel="stylesheet" href="style.css">
 </head>
-<body>
-  <div class="toolbar">
-    <button id="newBtn">📄 جديد</button>
-    <button id="openBtn">📂 فتح ملف</button>
-    <button id="saveBtn">💾 حفظ</button>
-    <select id="langSelect">
-      <option value="javascript">JavaScript</option>
-      <option value="python">Python</option>
-      <option value="html">HTML</option>
-      <option value="css">CSS</option>
-    </select>
-    <input type="range" id="fontSlider" min="12" max="32" value="18" step="1">
-    <span id="fontValue">18px</span>
-  </div>
 
-  <!-- سيتم تحويل هذا العنصر إلى محرر CodeMirror -->
-  <div class="editor-wrapper">
-    <textarea id="codeEditor" placeholder="اكتب كودك هنا ..."></textarea>
-  </div>
+<div class="app-container">
+    <div class="menu-bar">
+        <div class="menu-item">ملف
+            <div class="menu-dropdown">
+                <a id="menu-new">جديد</a>
+                <a id="menu-open">فتح ملف</a>
+                <a id="menu-save">حفظ</a>
+                <a id="menu-save-as">حفظ باسم</a>
+                <a id="menu-github-clone">استنساخ من GitHub</a>
+                <a id="menu-exit">خروج</a>
+            </div>
+        </div>
+        <div class="menu-item">تعديل
+            <div class="menu-dropdown">
+                <a id="menu-undo">تراجع</a>
+                <a id="menu-redo">إعادة</a>
+                <a id="menu-find">بحث</a>
+            </div>
+        </div>
+        <div class="menu-item">عرض
+            <div class="menu-dropdown">
+                <a id="menu-toggle-sidebar">إخفاء/إظهار الشريط الجانبي</a>
+                <a id="menu-inc-font">تكبير الخط</a>
+                <a id="menu-dec-font">تصغير الخط</a>
+            </div>
+        </div>
+        <div class="menu-item">مساعدة
+            <div class="menu-dropdown">
+                <a id="menu-about">عن ShadMini Code</a>
+            </div>
+        </div>
+    </div>
+    <div class="tabs-bar" id="tabsContainer"></div>
+    <div class="main-layout">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-icon" data-view="files">📁</div>
+            <div class="sidebar-icon" data-view="github">🐙</div>
+            <div class="sidebar-icon" data-view="settings">⚙️</div>
+        </div>
+        <div class="editor-wrapper" id="editorContainer"></div>
+        <div id="githubPanel" style="display: none; width: 250px; background: #252526; padding: 10px;">
+            <input type="text" id="repoUrl" placeholder="رابط المستودع" style="width:100%">
+            <button id="cloneRepo">استنساخ</button>
+            <button id="commitRepo">تأكيد التغييرات</button>
+            <button id="pushRepo">دفع إلى GitHub</button>
+        </div>
+    </div>
+    <div class="status-bar"><span id="statusMsg"></span></div>
+</div>
 
-  <div class="status-bar">
-    <span id="statusMsg">جاهز | ShadMini Code</span>
-  </div>
-
+  
   <!-- CodeMirror scripts -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <!-- إضافة دعم اللغات -->
