@@ -2,299 +2,239 @@
 <html dir="ltr" lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>ShadMini Code - محرر احترافي للهواتف</title>
-  <!-- CodeMirror CSS + Themes -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
+  <title>ShadMini Code - محرر الهواتف الاحترافي</title>
+  <!-- CodeMirror -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/dracula.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
-  <!-- Font Awesome 6 (مجاني) -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <!-- VS Code Codicons (أيقونات حقيقية من مايكروسوفت) -->
+  <link href="https://unpkg.com/@vscode/codicons@0.0.35/dist/codicon.css" rel="stylesheet">
+  <!-- isomorphic-git و lightning-fs للعمل مع Git حقيقياً -->
+  <script src="https://unpkg.com/isomorphic-git@1.25.0/index.umd.js"></script>
+  <script src="https://unpkg.com/lightning-fs@2.0.0"></script>
   <style>
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      user-select: none; /* تحسين اللمس */
+      -webkit-tap-highlight-color: transparent;
     }
-
     body {
-      background: #0a0a0f;
-      font-family: 'Segoe UI', 'Inter', system-ui, -apple-system, sans-serif;
+      background: #0e0e12;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       height: 100vh;
       overflow: hidden;
+      color: #e9e9e9;
     }
-
-    /* الحاوية الرئيسية */
     .app {
       display: flex;
       flex-direction: column;
-      height: 100vh;
-      background: #1e1e2e;
-      color: #e0e0e0;
+      height: 100%;
     }
-
-    /* شريط القوائم المنسدلة - حديث */
+    /* شريط القوائم بأسلوب VS Code */
     .menu-bar {
-      background: #15161e;
+      background: #18181b;
       padding: 6px 12px;
       display: flex;
       gap: 20px;
       font-size: 13px;
-      font-weight: 500;
-      border-bottom: 1px solid #2a2b36;
+      border-bottom: 1px solid #2e2e32;
     }
     .menu-item {
       position: relative;
       cursor: pointer;
-      padding: 4px 8px;
+      padding: 4px 10px;
       border-radius: 6px;
-      transition: 0.1s;
     }
-    .menu-item:hover {
-      background: #2a2b36;
-    }
+    .menu-item:hover { background: #2e2e32; }
     .menu-dropdown {
       position: absolute;
       top: 28px;
       left: 0;
-      background: #1e1f2c;
-      backdrop-filter: blur(10px);
+      background: #1e1e22;
+      backdrop-filter: blur(12px);
       min-width: 200px;
-      border-radius: 12px;
-      box-shadow: 0 12px 28px rgba(0,0,0,0.5);
+      border-radius: 8px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.5);
       display: none;
       flex-direction: column;
-      z-index: 1000;
-      border: 1px solid #3a3b45;
-      overflow: hidden;
+      z-index: 100;
+      border: 1px solid #3e3e42;
     }
-    .menu-item:hover .menu-dropdown {
-      display: flex;
-    }
+    .menu-item:hover .menu-dropdown { display: flex; }
     .menu-dropdown a {
-      padding: 10px 16px;
+      padding: 8px 16px;
       color: #ddd;
       text-decoration: none;
       font-size: 13px;
-      transition: 0.05s linear;
-      border-bottom: 1px solid #2a2b36;
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    .menu-dropdown a:hover {
-      background: #0078d4;
-      color: white;
-    }
-
-    /* التبويبات - عصرية */
+    .menu-dropdown a:hover { background: #0078d4; color: white; }
+    /* التبويبات */
     .tabs-container {
-      background: #13141c;
+      background: #141416;
       display: flex;
       overflow-x: auto;
-      white-space: nowrap;
-      border-bottom: 1px solid #2a2b36;
+      border-bottom: 1px solid #2e2e32;
       padding-left: 8px;
-      gap: 2px;
     }
     .tab {
       display: inline-flex;
       align-items: center;
       gap: 8px;
       padding: 8px 16px;
-      background: #1e1f2c;
-      color: #aaa;
-      border-top-left-radius: 8px;
-      border-top-right-radius: 8px;
+      background: #1e1e22;
+      border-top-left-radius: 6px;
+      border-top-right-radius: 6px;
       cursor: pointer;
-      transition: 0.1s;
-      border-bottom: 2px solid transparent;
       font-size: 13px;
+      border-bottom: 2px solid transparent;
     }
     .tab.active {
-      background: #1e1e2e;
-      color: white;
+      background: #0e0e12;
       border-bottom-color: #0078d4;
+      color: white;
     }
-    .tab .tab-close {
+    .tab-close {
       background: none;
       border: none;
       color: #aaa;
+      cursor: pointer;
       font-size: 14px;
-      cursor: pointer;
-      padding: 0 4px;
-      border-radius: 4px;
     }
-    .tab .tab-close:hover {
-      background: #ff4d4d20;
-      color: #ff7b7b;
-    }
-    .new-tab-btn {
-      background: none;
-      border: none;
-      color: #ccc;
-      font-size: 18px;
-      padding: 0 12px;
-      cursor: pointer;
-    }
-
-    /* التخطيط الرئيسي شريط جانبي + محرر */
+    /* تخطيط رئيسي */
     .main-layout {
       display: flex;
       flex: 1;
       overflow: hidden;
     }
     .sidebar {
-      width: 56px;
-      background: #15161e;
+      width: 48px;
+      background: #18181b;
       display: flex;
       flex-direction: column;
       align-items: center;
-      gap: 24px;
-      padding-top: 20px;
-      border-right: 1px solid #2a2b36;
+      padding-top: 16px;
+      gap: 20px;
+      border-right: 1px solid #2e2e32;
     }
     .sidebar-icon {
-      font-size: 24px;
-      color: #aaa;
+      font-size: 22px;
       cursor: pointer;
+      color: #aaa;
       transition: 0.1s;
-      padding: 8px;
-      border-radius: 12px;
     }
-    .sidebar-icon:hover, .sidebar-icon.active {
-      color: #0078d4;
-      background: #2a2b36;
-    }
+    .sidebar-icon:hover { color: #0078d4; }
     .editor-panel {
       flex: 1;
       display: flex;
       flex-direction: column;
-      overflow: hidden;
     }
     .editor-toolbar {
-      background: #1e1f2c;
+      background: #1e1e22;
       padding: 6px 12px;
       display: flex;
-      gap: 12px;
+      gap: 10px;
       align-items: center;
-      flex-wrap: wrap;
-      border-bottom: 1px solid #2a2b36;
+      border-bottom: 1px solid #2e2e32;
     }
     .editor-toolbar select, .editor-toolbar button {
-      background: #2a2b36;
+      background: #2e2e32;
       border: none;
       padding: 6px 12px;
-      border-radius: 8px;
+      border-radius: 6px;
       color: white;
       font-size: 12px;
-      cursor: pointer;
     }
-    .editor-wrapper {
-      flex: 1;
-      overflow: auto;
-    }
-    .CodeMirror {
-      height: 100%;
-      font-size: 16px;
-      font-family: 'Fira Code', 'Cascadia Code', monospace;
-    }
+    .editor-wrapper { flex: 1; overflow: auto; }
+    .CodeMirror { height: 100%; font-family: 'Fira Code', monospace; font-size: 15px; }
     .statusbar {
-      background: #15161e;
-      padding: 6px 16px;
+      background: #18181b;
+      padding: 4px 16px;
       display: flex;
       justify-content: space-between;
-      font-size: 12px;
-      border-top: 1px solid #2a2b36;
+      font-size: 11px;
+      border-top: 1px solid #2e2e32;
     }
-
-    /* لوحة GitHub المنبثقة */
     .floating-panel {
       position: fixed;
       top: 20%;
-      right: 20px;
+      right: 16px;
       width: 280px;
-      background: #1e1f2c;
-      border-radius: 16px;
+      background: #1e1e22;
+      border-radius: 12px;
       padding: 16px;
-      box-shadow: 0 20px 35px black;
-      border: 1px solid #3a3b45;
       display: none;
       flex-direction: column;
       gap: 12px;
-      z-index: 2000;
+      z-index: 200;
+      border: 1px solid #3e3e42;
+      box-shadow: 0 12px 28px black;
     }
     .floating-panel input, .floating-panel button {
       padding: 8px;
-      border-radius: 10px;
+      border-radius: 6px;
       border: none;
     }
     .floating-panel button {
       background: #0078d4;
       color: white;
     }
+    i[class^="codicon-"] { font-size: 18px; vertical-align: middle; }
   </style>
 </head>
 <body>
 <div class="app">
   <div class="menu-bar">
     <div class="menu-item">ملف
-      <div class="menu-dropdown">
-        <a id="menu-new">جديد ملف</a>
-        <a id="menu-open">فتح ملف محلي</a>
-        <a id="menu-save">حفظ (Ctrl+S)</a>
-        <a id="menu-github">اتصال GitHub</a>
-      </div>
+      <div class="menu-dropdown"><a id="menu-new"><i class="codicon codicon-new-file"></i> جديد</a>
+      <a id="menu-open"><i class="codicon codicon-folder-opened"></i> فتح ملف</a>
+      <a id="menu-save"><i class="codicon codicon-save"></i> حفظ</a>
+      <a id="menu-git-clone"><i class="codicon codicon-git-clone"></i> استنساخ من GitHub</a></div>
     </div>
     <div class="menu-item">تعديل
-      <div class="menu-dropdown">
-        <a id="menu-undo">تراجع</a>
-        <a id="menu-redo">إعادة</a>
-        <a id="menu-find">بحث (Ctrl+F)</a>
-      </div>
+      <div class="menu-dropdown"><a id="menu-undo"><i class="codicon codicon-discard"></i> تراجع</a>
+      <a id="menu-redo"><i class="codicon codicon-redo"></i> إعادة</a>
+      <a id="menu-find"><i class="codicon codicon-search"></i> بحث</a></div>
     </div>
     <div class="menu-item">عرض
-      <div class="menu-dropdown">
-        <a id="menu-font-inc">زيادة الخط</a>
-        <a id="menu-font-dec">إنقاص الخط</a>
-      </div>
+      <div class="menu-dropdown"><a id="font-inc"><i class="codicon codicon-zoom-in"></i> تكبير الخط</a>
+      <a id="font-dec"><i class="codicon codicon-zoom-out"></i> تصغير الخط</a></div>
     </div>
   </div>
-  
-  <div class="tabs-container" id="tabsContainer"></div>
 
+  <div class="tabs-container" id="tabsContainer"></div>
+  
   <div class="main-layout">
     <div class="sidebar">
-      <div class="sidebar-icon" data-panel="explorer"><i class="fas fa-folder-open"></i></div>
-      <div class="sidebar-icon" data-panel="github"><i class="fab fa-github"></i></div>
-      <div class="sidebar-icon" data-panel="settings"><i class="fas fa-cog"></i></div>
+      <div class="sidebar-icon" id="gitSidebarBtn"><i class="codicon codicon-github"></i></div>
+      <div class="sidebar-icon" id="explorerPlaceholder"><i class="codicon codicon-files"></i></div>
     </div>
     <div class="editor-panel">
       <div class="editor-toolbar">
-        <select id="languageSwitcher">
-          <option value="javascript">JavaScript</option><option value="python">Python</option><option value="html">HTML</option>
-          <option value="css">CSS</option><option value="cpp">C++</option><option value="java">Java</option>
-          <option value="csharp">C#</option><option value="go">Go</option><option value="ruby">Ruby</option>
-          <option value="rust">Rust</option><option value="json">JSON</option><option value="markdown">Markdown</option>
+        <select id="langSelect">
+          <option>javascript</option><option>python</option><option>html</option><option>css</option>
+          <option>cpp</option><option>java</option><option>go</option><option>rust</option>
         </select>
-        <button id="saveBtn"><i class="fas fa-save"></i> حفظ</button>
-        <span id="autoSaveStatus">💾 حفظ تلقائي</span>
+        <button id="manualSaveBtn"><i class="codicon codicon-save"></i> حفظ</button>
+        <span id="autoSaveStatus">حفظ تلقائي</span>
       </div>
-      <div class="editor-wrapper" id="editorWrapper">
-        <textarea id="codeEditor">// مرحباً بك في ShadMini Code - اكتب كودك هنا</textarea>
-      </div>
+      <div class="editor-wrapper" id="editorWrapper"><textarea id="codeEditor">// ShadMini Code - ابدأ كتابة كودك</textarea></div>
     </div>
   </div>
-  <div class="statusbar">
-    <span id="statusLang">JavaScript</span>
-    <span id="statusSaved">&#10004; تم الحفظ</span>
-    <span id="githubStatus"><i class="fab fa-github"></i> غير متصل</span>
-  </div>
+  <div class="statusbar"><span id="langStatus">javascript</span><span id="gitStatus"><i class="codicon codicon-github"></i> غير متصل</span></div>
 </div>
 
-<!-- لوحة GitHub المنبثقة -->
 <div id="githubPanel" class="floating-panel">
-  <input type="text" id="repoUrlInput" placeholder="مثال: https://github.com/user/repo" value="https://github.com/octocat/Hello-World">
-  <button id="cloneAction">📥 استنساخ تجريبي</button>
-  <button id="closeGithubPanel">إغلاق</button>
+  <input type="text" id="repoUrl" placeholder="رابط المستودع (HTTPS)" value="https://github.com/octocat/Hello-World">
+  <button id="cloneRealBtn">استنساخ حقيقي</button>
+  <button id="commitBtn">تأكيد (commit)</button>
+  <button id="pushBtn">رفع (push)</button>
+  <button id="closeGitPanel">إغلاق</button>
+  <div id="gitLog" style="font-size:11px; color:#aaa;"></div>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
@@ -304,258 +244,67 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/clike/clike.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/go/go.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/ruby/ruby.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/rust/rust.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/markdown/markdown.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/brace-fold.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/search.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/search/searchcursor.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/dialog/dialog.min.css">
 
 <script>
-  // --- إدارة التبويبات والمحرر المتقدم ---
-  let activeTabId = null;
-  let tabs = []; // { id, name, content, language, modified }
-  let editor = null;
+  // ---------- Core Editor + Tabs + AutoSave ----------
+  let editor, activeTabId = null, tabs = [];
+  let currentFs = null, currentGitDir = null;  // لنظام الملفات للمستودع المستنسخ
+
+  const langMode = { javascript:'javascript', python:'python', html:'htmlmixed', css:'css', cpp:'clike', java:'clike', go:'go', rust:'rust' };
   let autoSaveTimer = null;
-  let currentFontSize = 16;
+  const DB_NAME = 'ShadMiniV2';
 
-  // دعم 25 لغة (الخرائط)
-  const langModeMap = {
-    'javascript': 'javascript', 'python': 'python', 'html': 'htmlmixed', 'css': 'css', 'cpp': 'clike', 
-    'java': 'clike', 'csharp': 'clike', 'go': 'go', 'ruby': 'ruby', 'rust': 'rust', 'json': 'javascript', 'markdown': 'markdown'
-  };
-  function setEditorLanguage(lang) {
-    let mode = langModeMap[lang] || 'javascript';
-    editor.setOption('mode', mode);
-    if (activeTabId) {
-      let tab = tabs.find(t => t.id == activeTabId);
-      if (tab) tab.language = lang;
-    }
-    document.getElementById('statusLang').innerText = lang;
-    document.getElementById('languageSwitcher').value = lang;
-    triggerAutoSave();
-  }
+  async function openDB() { return new Promise((resolve)=> { let req=indexedDB.open(DB_NAME,1); req.onupgradeneeded=()=>req.result.createObjectStore('tabs'); req.onsuccess=()=>resolve(req.result); }); }
+  async function saveTabs() { if(!tabs.length) return; let db=await openDB(); let tx=db.transaction('tabs','readwrite'); tx.objectStore('tabs').put(JSON.stringify(tabs),'data'); db.close(); document.getElementById('autoSaveStatus').innerHTML='✓ حفظ'; setTimeout(()=>document.getElementById('autoSaveStatus').innerHTML='حفظ تلقائي',1200); }
+  async function loadTabs() { let db=await openDB(); let val=await new Promise(r=>{ let req=db.transaction('tabs').objectStore('tabs').get('data'); req.onsuccess=()=>r(req.result); }); db.close(); return val?JSON.parse(val):null; }
 
-  // حفظ تلقائي في IndexedDB (لتجنب قيود الحجم)
-  let db;
-  const DB_NAME = 'ShadMiniCodeDB';
-  const STORE_NAME = 'project';
-  function openDB() {
-    return new Promise((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, 1);
-      request.onupgradeneeded = () => {
-        const db = request.result;
-        if (!db.objectStoreNames.contains(STORE_NAME)) db.createObjectStore(STORE_NAME);
-      };
-      request.onsuccess = () => resolve(request.result);
-      request.onerror = () => reject(request.error);
-    });
-  }
-  async function saveTabsToDB() {
-    if (!db) db = await openDB();
-    const transaction = db.transaction(STORE_NAME, 'readwrite');
-    const store = transaction.objectStore(STORE_NAME);
-    store.put(JSON.stringify(tabs), 'tabs');
-    document.getElementById('statusSaved').innerHTML = '✓ تم الحفظ التلقائي';
-    setTimeout(() => document.getElementById('statusSaved').innerHTML = '💾 حفظ تلقائي', 1500);
-  }
-  async function loadTabsFromDB() {
-    if (!db) db = await openDB();
-    return new Promise((resolve) => {
-      const transaction = db.transaction(STORE_NAME, 'readonly');
-      const store = transaction.objectStore(STORE_NAME);
-      const getRequest = store.get('tabs');
-      getRequest.onsuccess = () => {
-        if (getRequest.result) resolve(JSON.parse(getRequest.result));
-        else resolve(null);
-      };
-      getRequest.onerror = () => resolve(null);
-    });
+  function triggerAutoSave() { if(autoSaveTimer) clearTimeout(autoSaveTimer); autoSaveTimer=setTimeout(()=>{ if(activeTabId && editor) { let tab=tabs.find(t=>t.id==activeTabId); if(tab) tab.content=editor.getValue(); saveTabs(); } },1500); }
+
+  function renderTabs() { let container=document.getElementById('tabsContainer'); container.innerHTML=''; tabs.forEach(tab=>{ let div=document.createElement('div'); div.className=`tab ${activeTabId===tab.id?'active':''}`; div.innerHTML=`<span>${tab.name}${tab.modified?'*':''}</span><button class="tab-close"><i class="codicon codicon-close"></i></button>`; div.querySelector('.tab-close').onclick=(e)=>{ e.stopPropagation(); closeTab(tab.id); }; div.onclick=()=>switchToTab(tab.id); container.appendChild(div); }); let newBtn=document.createElement('button'); newBtn.innerHTML='<i class="codicon codicon-plus"></i>'; newBtn.className='new-tab-btn'; newBtn.onclick=()=>createNewTab(); container.appendChild(newBtn); }
+
+  async function createNewTab(content='',name='new',lang='javascript') { let id=Date.now(); if(!content) content='// اكتب كودك هنا'; tabs.push({id,name:name.endsWith('.js')?name:name+'.'+lang,content,language:lang,modified:false}); renderTabs(); switchToTab(id); triggerAutoSave(); }
+
+  async function switchToTab(id) { if(activeTabId && editor){ let old=tabs.find(t=>t.id==activeTabId); if(old) old.content=editor.getValue(); } activeTabId=id; let tab=tabs.find(t=>t.id==id); if(!tab) return; document.getElementById('editorWrapper').innerHTML='<textarea id="codeEditor"></textarea>'; let textarea=document.getElementById('codeEditor'); if(editor) editor.toTextArea(); editor=CodeMirror.fromTextArea(textarea,{lineNumbers:true,theme:'dracula',mode:langMode[tab.language]||'javascript',autoCloseBrackets:true,matchBrackets:true,foldGutter:true,gutters:["CodeMirror-linenumbers","CodeMirror-foldgutter"],extraKeys:{"Ctrl-S":()=>{saveCurrentTab();}}}); editor.setValue(tab.content); editor.on('change',()=>{ let cur=tabs.find(t=>t.id==activeTabId); if(cur){ cur.content=editor.getValue(); cur.modified=true; triggerAutoSave(); renderTabs(); } }); document.getElementById('langSelect').value=tab.language; document.getElementById('langStatus').innerText=tab.language; renderTabs(); }
+
+  function saveCurrentTab() { if(activeTabId && editor){ let tab=tabs.find(t=>t.id==activeTabId); if(tab) tab.content=editor.getValue(); saveTabs(); document.getElementById('autoSaveStatus').innerHTML='✔ حفظ يدوي'; setTimeout(()=>document.getElementById('autoSaveStatus').innerHTML='حفظ تلقائي',1000); } }
+  function closeTab(id) { let idx=tabs.findIndex(t=>t.id==id); if(idx!==-1) tabs.splice(idx,1); if(tabs.length===0) createNewTab('// بداية جديدة','main','javascript'); if(activeTabId===id) activeTabId=tabs[0]?.id; if(activeTabId) switchToTab(activeTabId); renderTabs(); saveTabs(); }
+
+  // ---------- GitHub REAL (clone, commit, push) باستخدام isomorphic-git ----------
+  let gitToken = null; // سيطلب من المستخدم إدخال token (للبساطة سنطلبه عبر prompt)
+  async function getGitToken() { if(gitToken) return gitToken; let token = prompt("أدخل GitHub Personal Access Token (classic) مع صلاحيات repo",""); if(token) gitToken=token; return gitToken; }
+
+  async function realClone() { let url = document.getElementById('repoUrl').value; let repoName = url.split('/').pop().replace('.git',''); document.getElementById('gitLog').innerText='جارٍ الاستنساخ...'; let fs = new LightningFS('fs'); let dir = '/'+repoName; await fs.promises.mkdir(dir); await git.clone({ fs, http: git.http, dir, url, corsProxy: 'https://cors.isomorphic-git.org', depth: 1 }); currentFs = fs; currentGitDir = dir; document.getElementById('gitStatus').innerHTML='<i class="codicon codicon-github"></i> متصل: '+repoName; document.getElementById('gitLog').innerText='تم استنساخ '+repoName; // فتح الملف الرئيسي (مثال) 
+    let files = await fs.promises.readdir(dir); let mainFile = files.find(f=>f.endsWith('.js')||f.endsWith('.py')||f.endsWith('.md')); if(mainFile){ let content = await fs.promises.readFile(dir+'/'+mainFile,'utf8'); createNewTab(content, mainFile, 'javascript'); } 
   }
 
-  function triggerAutoSave() {
-    if (autoSaveTimer) clearTimeout(autoSaveTimer);
-    autoSaveTimer = setTimeout(() => {
-      if (activeTabId && editor) {
-        const currentTab = tabs.find(t => t.id == activeTabId);
-        if (currentTab) currentTab.content = editor.getValue();
-        saveTabsToDB();
-      }
-    }, 1500);
-  }
+  async function realCommit() { if(!currentFs || !currentGitDir) { alert('لا يوجد مستودع مستنسخ'); return; } let token = await getGitToken(); if(!token) return; await git.add({ fs: currentFs, dir: currentGitDir, filepath: '.' }); await git.commit({ fs: currentFs, dir: currentGitDir, message: 'تحديث من ShadMini Code', author: { name: 'ShadMini', email: 'mobile@shadmini.com' } }); document.getElementById('gitLog').innerText='تم التأكيد محلياً'; }
 
-  // عرض التبويبات
-  function renderTabs() {
-    const container = document.getElementById('tabsContainer');
-    container.innerHTML = '';
-    tabs.forEach(tab => {
-      const tabDiv = document.createElement('div');
-      tabDiv.className = `tab ${activeTabId === tab.id ? 'active' : ''}`;
-      tabDiv.setAttribute('data-id', tab.id);
-      tabDiv.innerHTML = `
-        <span class="tab-name">${tab.name}${tab.modified ? '*' : ''}</span>
-        <button class="tab-close"><i class="fas fa-times"></i></button>
-      `;
-      tabDiv.addEventListener('click', (e) => {
-        if (e.target.classList.contains('tab-close')) {
-          e.stopPropagation();
-          closeTab(tab.id);
-        } else switchToTab(tab.id);
-      });
-      container.appendChild(tabDiv);
-    });
-    const newBtn = document.createElement('button');
-    newBtn.className = 'new-tab-btn';
-    newBtn.innerHTML = '<i class="fas fa-plus"></i>';
-    newBtn.onclick = () => createNewTab();
-    container.appendChild(newBtn);
-  }
+  async function realPush() { if(!currentFs || !currentGitDir) return; let token = await getGitToken(); await git.push({ fs: currentFs, dir: currentGitDir, remote: 'origin', ref: 'main', onAuth: () => ({ username: token, password: 'x-oauth-basic' }), corsProxy: 'https://cors.isomorphic-git.org' }); document.getElementById('gitLog').innerText='تم الرفع إلى GitHub'; }
 
-  function closeTab(id) {
-    const idx = tabs.findIndex(t => t.id == id);
-    if (idx !== -1) tabs.splice(idx, 1);
-    if (tabs.length === 0) createNewTab();
-    if (activeTabId == id) {
-      activeTabId = tabs[0]?.id || null;
-      if (activeTabId) switchToTab(activeTabId);
-    }
-    renderTabs();
-    triggerAutoSave();
-  }
-
-  async function createNewTab(content = '// ابدأ البرمجة هنا', name = 'غير مسمى', language = 'javascript') {
-    const id = Date.now();
-    tabs.push({ id, name, content, language, modified: false });
-    renderTabs();
-    await switchToTab(id);
-    triggerAutoSave();
-  }
-
-  async function switchToTab(id) {
-    if (activeTabId && editor) {
-      const oldTab = tabs.find(t => t.id == activeTabId);
-      if (oldTab) oldTab.content = editor.getValue();
-    }
-    activeTabId = id;
-    const tab = tabs.find(t => t.id == id);
-    if (!tab) return;
-    const wrapper = document.getElementById('editorWrapper');
-    wrapper.innerHTML = '<textarea id="codeEditor"></textarea>';
-    const textarea = document.getElementById('codeEditor');
-    if (editor) editor.toTextArea();
-    editor = CodeMirror.fromTextArea(textarea, {
-      lineNumbers: true,
-      theme: "dracula",
-      mode: langModeMap[tab.language] || 'javascript',
-      autoCloseBrackets: true,
-      matchBrackets: true,
-      foldGutter: true,
-      gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
-      extraKeys: {
-        "Ctrl-S": () => { saveCurrentContent(); },
-        "Cmd-S": () => { saveCurrentContent(); },
-        "Ctrl-F": () => { editor.execCommand("find"); }
-      }
-    });
-    editor.setValue(tab.content);
-    editor.on('change', () => {
-      const current = tabs.find(t => t.id == activeTabId);
-      if (current) {
-        current.content = editor.getValue();
-        current.modified = true;
-        triggerAutoSave();
-        renderTabs(); // لتحديث علامة *
-      }
-    });
-    setEditorLanguage(tab.language);
-    document.getElementById('statusLang').innerText = tab.language;
-    renderTabs();
-  }
-
-  function saveCurrentContent() {
-    if (activeTabId && editor) {
-      const tab = tabs.find(t => t.id == activeTabId);
-      if (tab) tab.content = editor.getValue();
-      saveTabsToDB();
-      document.getElementById('statusSaved').innerHTML = '✓ تم الحفظ يدوياً';
-      setTimeout(() => document.getElementById('statusSaved').innerHTML = '💾 حفظ تلقائي', 1000);
-    }
-  }
-
-  // فتح ملف من الجهاز
-  function openLocalFile() {
-    const input = document.createElement('input');
-    input.type = 'file';
-    input.onchange = async (e) => {
-      const file = e.target.files[0];
-      const text = await file.text();
-      const ext = file.name.split('.').pop();
-      let lang = 'javascript';
-      if (ext === 'py') lang = 'python';
-      else if (ext === 'html') lang = 'html';
-      else if (ext === 'css') lang = 'css';
-      else if (ext === 'cpp' || ext === 'c') lang = 'cpp';
-      else if (ext === 'java') lang = 'java';
-      else if (ext === 'go') lang = 'go';
-      else if (ext === 'md') lang = 'markdown';
-      await createNewTab(text, file.name, lang);
-    };
-    input.click();
-  }
-
-  // GitHub تجريبي (محاكاة استنساخ)
-  function showGithubPanel() {
-    const panel = document.getElementById('githubPanel');
-    panel.style.display = 'flex';
-    document.getElementById('cloneAction').onclick = () => {
-      const url = document.getElementById('repoUrlInput').value;
-      document.getElementById('githubStatus').innerHTML = `<i class="fab fa-github"></i> تم استنساخ ${url.split('/').pop()}`;
-      panel.style.display = 'none';
-      alert('تم استنساخ وهمي (عرض توضيحي). يمكنك فيما بعد ربطه بـ isomorphic-git.');
-    };
-    document.getElementById('closeGithubPanel').onclick = () => panel.style.display = 'none';
-  }
-
-  // تهيئة التطبيق
-  async function init() {
-    await openDB();
-    const savedTabs = await loadTabsFromDB();
-    if (savedTabs && savedTabs.length) {
-      tabs = savedTabs;
-      activeTabId = tabs[0].id;
-    } else {
-      tabs = [{ id: Date.now(), name: 'main.js', content: '// ShadMini Code - محرر حديث\nconsole.log("مرحباً");', language: 'javascript', modified: false }];
-      activeTabId = tabs[0].id;
-    }
-    renderTabs();
-    await switchToTab(activeTabId);
-    
-    // ربط الواجهات
-    document.getElementById('menu-new').onclick = () => createNewTab();
-    document.getElementById('menu-open').onclick = () => openLocalFile();
-    document.getElementById('menu-save').onclick = () => saveCurrentContent();
-    document.getElementById('menu-github').onclick = () => showGithubPanel();
-    document.getElementById('menu-undo').onclick = () => editor.undo();
-    document.getElementById('menu-redo').onclick = () => editor.redo();
-    document.getElementById('menu-find').onclick = () => editor.execCommand("find");
-    document.getElementById('menu-font-inc').onclick = () => { currentFontSize += 2; document.querySelector('.CodeMirror').style.fontSize = currentFontSize + 'px'; };
-    document.getElementById('menu-font-dec').onclick = () => { currentFontSize = Math.max(10, currentFontSize-2); document.querySelector('.CodeMirror').style.fontSize = currentFontSize + 'px'; };
-    document.getElementById('saveBtn').onclick = () => saveCurrentContent();
-    document.getElementById('languageSwitcher').onchange = (e) => setEditorLanguage(e.target.value);
-    document.querySelectorAll('.sidebar-icon').forEach(icon => {
-      icon.onclick = () => {
-        if(icon.getAttribute('data-panel') === 'github') showGithubPanel();
-        else alert('لوحة المستكشف والإعدادات قريباً');
-      };
-    });
-    // ضبط حجم الخط الأولي
-    document.querySelector('.CodeMirror').style.fontSize = currentFontSize + 'px';
-  }
-  init();
+  // ---------- أحداث الواجهة ----------
+  window.onload = async()=>{ let saved = await loadTabs(); if(saved && saved.length) { tabs=saved; activeTabId=tabs[0].id; } else { createNewTab('// Hello from ShadMini Code\nconsole.log("جاهز");','hello.js','javascript'); } renderTabs(); switchToTab(activeTabId); };
+  document.getElementById('menu-new').onclick=()=>createNewTab(); document.getElementById('menu-open').onclick=()=>{ let input=document.createElement('input'); input.type='file'; input.onchange=async(e)=>{ let file=e.target.files[0]; let text=await file.text(); let ext=file.name.split('.').pop(); let lang='javascript'; if(ext=='py') lang='python'; else if(ext=='html') lang='html'; else if(ext=='css') lang='css'; createNewTab(text,file.name,lang); }; input.click(); };
+  document.getElementById('menu-save').onclick=()=>saveCurrentTab();
+  document.getElementById('menu-git-clone').onclick=()=>document.getElementById('githubPanel').style.display='flex';
+  document.getElementById('closeGitPanel').onclick=()=>document.getElementById('githubPanel').style.display='none';
+  document.getElementById('cloneRealBtn').onclick=()=>realClone();
+  document.getElementById('commitBtn').onclick=()=>realCommit();
+  document.getElementById('pushBtn').onclick=()=>realPush();
+  document.getElementById('menu-undo').onclick=()=>editor.undo();
+  document.getElementById('menu-redo').onclick=()=>editor.redo();
+  document.getElementById('menu-find').onclick=()=>editor.execCommand("find");
+  document.getElementById('font-inc').onclick=()=>{ let cur=parseInt(getComputedStyle(document.querySelector('.CodeMirror')).fontSize); document.querySelector('.CodeMirror').style.fontSize=(cur+2)+'px'; };
+  document.getElementById('font-dec').onclick=()=>{ let cur=parseInt(getComputedStyle(document.querySelector('.CodeMirror')).fontSize); document.querySelector('.CodeMirror').style.fontSize=Math.max(10,cur-2)+'px'; };
+  document.getElementById('manualSaveBtn').onclick=()=>saveCurrentTab();
+  document.getElementById('langSelect').onchange=(e)=>{ let lang=e.target.value; let tab=tabs.find(t=>t.id==activeTabId); if(tab){ tab.language=lang; editor.setOption('mode',langMode[lang]||'javascript'); document.getElementById('langStatus').innerText=lang; triggerAutoSave(); renderTabs(); } };
+  document.getElementById('gitSidebarBtn').onclick=()=>document.getElementById('githubPanel').style.display='flex';
 </script>
 </body>
-  </html>
+</html>
