@@ -1,0 +1,18 @@
+const languageMap = {
+    js: { mode: 'javascript', name: 'JavaScript' },
+    py: { mode: 'python', name: 'Python' },
+    html: { mode: 'htmlmixed', name: 'HTML' },
+    css: { mode: 'css', name: 'CSS' },
+    php: { mode: 'php', name: 'PHP' },
+    cpp: { mode: 'clike', name: 'C++' },
+    cs: { mode: 'clike', name: 'C#' },
+    java: { mode: 'clike', name: 'Java' },
+    go: { mode: 'go', name: 'Go' },
+    rb: { mode: 'ruby', name: 'Ruby' },
+    swift: { mode: 'swift', name: 'Swift' },
+    kt: { mode: 'kotlin', name: 'Kotlin' },
+    rs: { mode: 'rust', name: 'Rust' },
+    json: { mode: 'javascript', name: 'JSON' },
+    md: { mode: 'markdown', name: 'Markdown' }
+};
+function getModeFromLanguage(lang) { return languageMap[lang]?.mode || 'javascript'; }
