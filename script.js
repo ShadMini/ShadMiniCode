@@ -41,6 +41,97 @@ fontSlider.addEventListener('input', () => {
   }, 1000);
 });
 
+// بيانات التبويبات
+let tabs = []; // { id, name, content, language, modified }
+let activeTabId = null;
+
+// تحميل آخر حالة من localStorage
+function loadState() {
+    const saved = localStorage.getItem('shadmini_tabs');
+    if (saved) {
+        tabs = JSON.parse(saved);
+        renderTabs();
+        if (tabs.length) switchToTab(tabs[0].id);
+    } else {
+        createNewTab();
+    }
+}
+
+// حفظ الحالة تلقائياً (كل 2 ثانية أو عند التغيير)
+let autoSaveTimer;
+function triggerAutoSave() {
+    clearTimeout(autoSaveTimer);
+    autoSaveTimer = setTimeout(() => {
+        localStorage.setItem('shadmini_tabs', JSON.stringify(tabs.map(tab => ({
+            id: tab.id, name: tab.name, content: tab.content,
+            language: tab.language, modified: tab.modified
+        }))));
+        updateStatus('تم الحفظ التلقائي', 1500);
+    }, 2000);
+}
+
+// إنشاء علامة تبويب جديدة
+function createNewTab(content = '', language = 'javascript', name = 'غير مسمى') {
+    const id = Date.now();
+    const newTab = {
+        id, name, content,
+        language, modified: false
+    };
+    tabs.push(newTab);
+    renderTabs();
+    switchToTab(id);
+    triggerAutoSave();
+}
+
+// تبديل المحرر - إعادة تهيئة CodeMirror باللغة المناسبة
+function switchToTab(tabId) {
+    // حفظ محتوى المحرر الحالي في التبويب النشط
+    if (activeTabId && editor) {
+        const currentTab = tabs.find(t => t.id === activeTabId);
+        if (currentTab) currentTab.content = editor.getValue();
+    }
+    activeTabId = tabId;
+    const tab = tabs.find(t => t.id === tabId);
+    if (!tab) return;
+    // إعادة إنشاء محرر CodeMirror (أو إعادة تعيين قيمته)
+    // نستخدم نفس الحاوية ولكن نحرر المحرر القديم
+    const container = document.getElementById('editorContainer');
+    container.innerHTML = '<textarea id="codeEditor"></textarea>';
+    const textarea = document.getElementById('codeEditor');
+    if (window.editorInstance) window.editorInstance.toTextArea();
+    editor = CodeMirror.fromTextArea(textarea, {
+        lineNumbers: true,
+        theme: "material-darker",
+        mode: getModeFromLanguage(tab.language),
+        autoCloseBrackets: true,
+        matchBrackets: true,
+        foldGutter: true,
+        gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"]
+    });
+    editor.setValue(tab.content);
+    editor.on('change', () => {
+        const current = tabs.find(t => t.id === activeTabId);
+        if (current) {
+            current.content = editor.getValue();
+            current.modified = true;
+            triggerAutoSave();
+            updateTabUI(current.id);
+        }
+    });
+    window.editorInstance = editor;
+    updateStatus(`مفتوح: ${tab.name}`);
+}
+
+function updateTabUI(tabId) {
+    // تحديث عرض التبويبات (علامة * إذا كان معدلاً)
+    const tabElement = document.querySelector(`.tab[data-id='${tabId}']`);
+    if (tabElement) {
+        const tab = tabs.find(t => t.id === tabId);
+        if (tab.modified) tabElement.querySelector('.tab-name').innerHTML += '*';
+    }
+    }
+
+
 // تغيير وضع اللغة في المحرر وفقاً للقائمة المنسدلة
 function changeLanguage(mode) {
   let modeValue = 'javascript';
