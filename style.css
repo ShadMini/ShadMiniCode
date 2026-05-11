@@ -96,3 +96,112 @@ input[type="range"] {
     font-size: 18px;
   }
 }
+/* إضافة متغيرات للألوان */
+:root {
+    --bg-sidebar: #252526;
+    --bg-editor: #1e1e1e;
+    --tab-active: #1e1e1e;
+    --tab-inactive: #2d2d2d;
+    --accent: #007acc;
+}
+
+.app-container {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+
+.main-layout {
+    display: flex;
+    flex: 1;
+    overflow: hidden;
+}
+
+.sidebar {
+    width: 48px;
+    background: var(--bg-sidebar);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-top: 12px;
+    gap: 16px;
+    border-right: 1px solid #3c3c3c;
+}
+
+.sidebar-icon {
+    font-size: 24px;
+    cursor: pointer;
+    opacity: 0.7;
+    transition: 0.2s;
+}
+.sidebar-icon:hover, .sidebar-icon.active {
+    opacity: 1;
+    border-left: 2px solid var(--accent);
+    padding-left: 4px;
+}
+
+/* منطقة التبويبات */
+.tabs-bar {
+    background: #2d2d2d;
+    display: flex;
+    overflow-x: auto;
+    white-space: nowrap;
+    border-bottom: 1px solid #3c3c3c;
+}
+.tab {
+    padding: 8px 16px;
+    background: var(--tab-inactive);
+    color: #ccc;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    border-right: 1px solid #3c3c3c;
+}
+.tab.active {
+    background: var(--tab-active);
+    color: white;
+    border-top: 2px solid var(--accent);
+}
+.tab-close {
+    background: none;
+    border: none;
+    color: #ccc;
+    font-weight: bold;
+}
+
+/* القوائم المنسدلة (شريط القوائم العلوي) */
+.menu-bar {
+    background: #3c3c3c;
+    padding: 4px 12px;
+    display: flex;
+    gap: 20px;
+    font-size: 14px;
+}
+.menu-item {
+    position: relative;
+    cursor: pointer;
+    padding: 4px 8px;
+}
+.menu-dropdown {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    background: #3c3c3c;
+    min-width: 180px;
+    display: none;
+    flex-direction: column;
+    z-index: 1000;
+    border: 1px solid #555;
+}
+.menu-dropdown a {
+    padding: 6px 12px;
+    color: white;
+    text-decoration: none;
+}
+.menu-dropdown a:hover {
+    background: #094771;
+}
+.menu-item:hover .menu-dropdown {
+    display: flex;
+}
