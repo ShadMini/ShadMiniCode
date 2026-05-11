@@ -4,6 +4,14 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
   <title>ShadMini Code - محرر الأكواد</title>
+  
+  <!-- CodeMirror CSS (ثيم VS Code Dark) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/material-darker.min.css">
+  
+  <!-- لغات CodeMirror (سنحمّل الأساسية فقط) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.css">
+  
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -21,6 +29,7 @@
     <span id="fontValue">18px</span>
   </div>
 
+  <!-- سيتم تحويل هذا العنصر إلى محرر CodeMirror -->
   <div class="editor-wrapper">
     <textarea id="codeEditor" placeholder="اكتب كودك هنا ..."></textarea>
   </div>
@@ -28,6 +37,19 @@
   <div class="status-bar">
     <span id="statusMsg">جاهز | ShadMini Code</span>
   </div>
+
+  <!-- CodeMirror scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <!-- إضافة دعم اللغات -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/htmlmixed/htmlmixed.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/css/css.min.js"></script>
+  
+  <!-- إضافات مفيدة (طي الأكواد، البحث، إلخ) اختياري -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldcode.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/foldgutter.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/fold/brace-fold.min.js"></script>
 
   <script src="script.js"></script>
 </body>
