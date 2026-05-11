@@ -1,5 +1,4 @@
-// عناصر DOM
-const editor = document.getElementById('codeEditor');
+// عناصر التحكم
 const langSelect = document.getElementById('langSelect');
 const fontSlider = document.getElementById('fontSlider');
 const fontValue = document.getElementById('fontValue');
@@ -8,10 +7,33 @@ const newBtn = document.getElementById('newBtn');
 const openBtn = document.getElementById('openBtn');
 const saveBtn = document.getElementById('saveBtn');
 
-// ضبط حجم الخط
+// تهيئة محرر CodeMirror
+const textarea = document.getElementById('codeEditor');
+let editor = CodeMirror.fromTextArea(textarea, {
+  lineNumbers: true,          // أرقام الأسطر
+  theme: "material-darker",   // ثيم غامق يشبه VS Code
+  mode: "javascript",         // اللغة الافتراضية
+  autoCloseBrackets: true,    // إغلاق الأقواس تلقائياً
+  matchBrackets: true,        // تمييز الأقواس المتطابقة
+  foldGutter: true,           // طي الأكواد
+  gutters: ["CodeMirror-linenumbers", "CodeMirror-foldgutter"],
+  extraKeys: {
+    "Ctrl-S": function(cm) { saveFile(); },  // حفظ بـ Ctrl+S
+    "Cmd-S": function(cm) { saveFile(); }
+  }
+});
+
+// ضبط حجم الخط في CodeMirror (يؤثر على الكل)
+function setEditorFontSize(size) {
+  const cmElements = document.querySelectorAll('.CodeMirror');
+  cmElements.forEach(el => {
+    el.style.fontSize = size + 'px';
+  });
+}
+// ربط شريط التحكم بالخط
 fontSlider.addEventListener('input', () => {
   const val = fontSlider.value;
-  editor.style.fontSize = val + 'px';
+  setEditorFontSize(val);
   fontValue.innerText = val + 'px';
   statusMsg.innerText = `الخط: ${val}px`;
   setTimeout(() => {
@@ -19,30 +41,30 @@ fontSlider.addEventListener('input', () => {
   }, 1000);
 });
 
-// تغيير اللغة (للتوسع مستقبلاً مع تمييز الصيغ)
-langSelect.addEventListener('change', () => {
-  statusMsg.innerText = `اللغة: ${langSelect.value}`;
+// تغيير وضع اللغة في المحرر وفقاً للقائمة المنسدلة
+function changeLanguage(mode) {
+  let modeValue = 'javascript';
+  switch(mode) {
+    case 'javascript': modeValue = 'javascript'; break;
+    case 'python': modeValue = 'python'; break;
+    case 'html': modeValue = 'htmlmixed'; break;
+    case 'css': modeValue = 'css'; break;
+    default: modeValue = 'javascript';
+  }
+  editor.setOption('mode', modeValue);
+  statusMsg.innerText = `اللغة: ${mode}`;
   setTimeout(() => {
     if (statusMsg.innerText.includes('اللغة')) statusMsg.innerText = 'جاهز | ShadMini Code';
   }, 800);
-});
+}
 
-// ملف جديد
-newBtn.addEventListener('click', () => {
-  if (editor.value.trim() !== '' && confirm('سيتم مسح المحرر. متأكد؟')) {
-    editor.value = '';
-    statusMsg.innerText = 'ملف جديد فارغ';
-    setTimeout(() => statusMsg.innerText = 'جاهز | ShadMini Code', 1200);
-  } else if (editor.value.trim() === '') {
-    editor.value = '';
-    statusMsg.innerText = 'ملف جديد';
-    setTimeout(() => statusMsg.innerText = 'جاهز | ShadMini Code', 1000);
-  }
+langSelect.addEventListener('change', (e) => {
+  changeLanguage(e.target.value);
 });
 
 // حفظ الملف
-saveBtn.addEventListener('click', () => {
-  const content = editor.value;
+function saveFile() {
+  const content = editor.getValue();
   if (!content.trim()) {
     statusMsg.innerText = 'لا يوجد كود للحفظ!';
     return;
@@ -58,9 +80,23 @@ saveBtn.addEventListener('click', () => {
   URL.revokeObjectURL(url);
   statusMsg.innerText = `تم الحفظ ✅ (${filename})`;
   setTimeout(() => statusMsg.innerText = 'جاهز | ShadMini Code', 2000);
+}
+saveBtn.addEventListener('click', saveFile);
+
+// ملف جديد
+newBtn.addEventListener('click', () => {
+  if (editor.getValue().trim() !== '' && confirm('سيتم مسح المحرر. متأكد؟')) {
+    editor.setValue('');
+    statusMsg.innerText = 'ملف جديد فارغ';
+    setTimeout(() => statusMsg.innerText = 'جاهز | ShadMini Code', 1200);
+  } else if (editor.getValue().trim() === '') {
+    editor.setValue('');
+    statusMsg.innerText = 'ملف جديد';
+    setTimeout(() => statusMsg.innerText = 'جاهز | ShadMini Code', 1000);
+  }
 });
 
-// فتح ملف من الجهاز
+// فتح ملف
 openBtn.addEventListener('click', () => {
   const input = document.createElement('input');
   input.type = 'file';
@@ -70,14 +106,25 @@ openBtn.addEventListener('click', () => {
     if (!file) return;
     const reader = new FileReader();
     reader.onload = (ev) => {
-      editor.value = ev.target.result;
+      editor.setValue(ev.target.result);
       statusMsg.innerText = `فتح: ${file.name}`;
-      // تغيير قائمة اللغة حسب الامتداد
-      if (file.name.endsWith('.py')) langSelect.value = 'python';
-      else if (file.name.endsWith('.html')) langSelect.value = 'html';
-      else if (file.name.endsWith('.css')) langSelect.value = 'css';
-      else if (file.name.endsWith('.js')) langSelect.value = 'javascript';
-      else langSelect.value = 'javascript';
+      // تحديد اللغة حسب الامتداد
+      if (file.name.endsWith('.py')) {
+        langSelect.value = 'python';
+        changeLanguage('python');
+      } else if (file.name.endsWith('.html')) {
+        langSelect.value = 'html';
+        changeLanguage('html');
+      } else if (file.name.endsWith('.css')) {
+        langSelect.value = 'css';
+        changeLanguage('css');
+      } else if (file.name.endsWith('.js')) {
+        langSelect.value = 'javascript';
+        changeLanguage('javascript');
+      } else {
+        langSelect.value = 'javascript';
+        changeLanguage('javascript');
+      }
       setTimeout(() => statusMsg.innerText = 'جاهز | ShadMini Code', 1500);
     };
     reader.readAsText(file);
@@ -85,13 +132,7 @@ openBtn.addEventListener('click', () => {
   input.click();
 });
 
-// اختصار Ctrl+S للحفظ (عند استخدام لوحة مفاتيح خارجية)
-editor.addEventListener('keydown', (e) => {
-  if ((e.ctrlKey || e.metaKey) && e.key === 's') {
-    e.preventDefault();
-    saveBtn.click();
-  }
-});
+// ضبط حجم الخط الابتدائي
+setEditorFontSize(fontSlider.value);
 
-// رسالة ترحيب
-console.log('ShadMini Code - محرر الهواتف النقالة');
+console.log('ShadMini Code مع تمييز صيغ كامل (مثل VS Code)');
